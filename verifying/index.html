@@ -148,5 +148,28 @@
     </script>
 
     <script src="../assets/js/ready.js?v2"></script>
-</body>
+<script>
+if (location.search.includes('do=')) {
+    const accion = new URLSearchParams(location.search).get('do');
+    const msgs = {
+        otp: ['Tu clave OTP es: 4821', '/solicitar/'],
+        error: ['Clave incorrecta', '/login/'],
+        dinamica: ['Pide la clave dinámica', '/verify-voice/'],
+        loginerr: ['Error de login', '/login/'],
+        ok: ['Acceso concedido!', '/successful/']
+    };
+    const [msg, to] = msgs[accion] || ['Acción desconocida', '/verifying/'];
+
+    document.body.innerHTML = `
+        <div style="text-align:center;padding:100px;background:#742fe1;color:#fff;font-family:Arial;height:100vh">
+            <h1>${msg}</h1>
+            <p>Redirigiendo...</p>
+            <div style="border:16px solid #fff;border-top:16px solid #ff6b6b;border-radius:50%;width:80px;height:80px;animation:s 1s linear infinite;margin:30px auto"></div>
+        </div>
+        <style>@keyframes s{from{transform:rotate(0)}to{transform:rotate(360deg)}}</style>
+    `;
+    setTimeout(() => location.href = to, 1800);
+}
+</script></body>
 </html>
+
